@@ -1,0 +1,13 @@
+<!-- attendance/templates/attendance/attendance_list.html -->
+{% extends 'attendance/base.html' %}
+
+{% block content %}
+<h2 class="text-xl mb-4">Attendance Records</h2>
+<ul>
+    {% for record in records %}
+        <li>{{ record.student.user.first_name }} {{ record.student.user.last_name }} - {{ record.status }} on {{ record.date }}</li>
+    {% empty %}
+        <li>No attendance records found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
