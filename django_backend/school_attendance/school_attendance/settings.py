@@ -24,6 +24,16 @@ SECRET_KEY = 'django-insecure-wnemh-52#tdvrnkss(i#3lzo)s*jodhm38sznd@1w%hvi2u-0!
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.your-email-provider.com'  # e.g., smtp.gmail.com
+EMAIL_PORT = 587  # Use 465 for SSL
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'akimanaviateur94@gmail.com'
+EMAIL_HOST_PASSWORD = 'Viateur123!'
+DEFAULT_FROM_EMAIL = 'akimanaviateur94@gmail.com'  # Used as the 'from' address in sent emails
+
+
 
 ALLOWED_HOSTS = []
 
@@ -40,9 +50,20 @@ INSTALLED_APPS = [
     'attendance.apps.AttendanceConfig',
     'rest_framework'
 ]
-# school_attendance/settings.py
-# INSTALLED_APPS += ['corsheaders']
-# MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+AUTH_USER_MODEL = 'attendance.User'  # Custom User model
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Vite frontend URL
