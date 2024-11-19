@@ -1,0 +1,29 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django stuff:
+*.log
+school_attendance/db.sqlite3
+*.sqlite3
+
+# Environment variables
+.env
+
+# Virtualenv
+venv/
+ENV/
+env/
+venv.bak/
+*.bak
+
+# VSCode settings
+.vscode/
+
+# macOS files
+.DS_Store
+
+# IDE configurations
+.idea/
