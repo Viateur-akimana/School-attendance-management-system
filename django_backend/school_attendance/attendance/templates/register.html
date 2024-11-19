@@ -10,20 +10,29 @@
 <body>
     <div class="container">
         <h2 class="form-title">Create an Account</h2>
-
+        
         {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message {{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
         {% endif %}
-
+        
         <form method="post" class="form-container">
             {% csrf_token %}
-            {{ form.as_p }}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="error">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
             <button type="submit" class="submit-btn">Register</button>
         </form>
+        
         <p class="auth-link">Already have an account? <a href="{% url 'login' %}" class="auth-link-text">Log in</a></p>
     </div>
 </body>

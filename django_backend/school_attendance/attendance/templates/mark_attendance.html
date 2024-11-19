@@ -20,7 +20,7 @@
                     <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
                     <li><a href="{% url 'list_students' %}" class="block py-2 px-4 hover:bg-gray-700">Students</a></li>
                     <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700">Classes</a></li>
-                    <li><a href="{% url 'mark_attendance' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
+                    <li><a href="{% url 'attendance_list' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
                     <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700">Reports</a></li>
                     <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
                 </ul>
@@ -54,28 +54,29 @@
 
                         <!-- Dynamic student input dropdown -->
                         <div class="flex items-center justify-between">
-                            <label class="font-medium" for="student">Student:</label>
+                            <label class="font-medium" for="student">Student Name:</label>
                             <select name="student" id="student" class="w-1/3 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 <option value="">Select Student</option>
                                 {% for student in students %}
-                                <option value="{{ student.id }}">{{ student.name }}</option>
+                                <option value="{{ student.id }}">{{ student.name }} ({{ student.roll_number }})</option>
                                 {% endfor %}
                             </select>
                         </div>
 
-                        <!-- Attendance status dropdown -->
+                        <!-- Status field dropdown -->
                         <div class="flex items-center justify-between">
                             <label class="font-medium" for="status">Attendance Status:</label>
                             <select name="status" id="status" class="w-1/3 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="present">Present</option>
-                                <option value="absent">Absent</option>
-                                <option value="late">Late</option>
+                                <option value="Present">Present</option>
+                                <option value="Absent">Absent</option>
+                                <option value="Excused">Excused</option>
                             </select>
                         </div>
-                    </div>
 
-                    <div class="mt-6">
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Mark Attendance</button>
+                        <!-- Submit button -->
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600">Save Attendance</button>
+                        </div>
                     </div>
                 </form>
             </div>

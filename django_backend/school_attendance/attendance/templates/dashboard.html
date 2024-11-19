@@ -7,6 +7,7 @@
     <title>Dashboard - Attendance Management</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="font-sans bg-gray-100">
 
@@ -21,7 +22,7 @@
                     <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
                     <li><a href="{% url 'list_students' %}" class="block py-2 px-4 hover:bg-gray-700">Students</a></li>
                     <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700">Classes</a></li>
-                    <li><a href="{% url 'mark_attendance' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
+                    <li><a href="{% url 'attendance_list' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
                     <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700">Reports</a></li>
                     <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
                 </ul>
@@ -31,26 +32,126 @@
         <!-- Main Content -->
         <div class="flex-1 p-6">
             <div class="bg-white shadow-md rounded-lg p-8">
-                <h2 class="text-2xl font-semibold">Welcome back, [User's Name]</h2>
-                <p class="mt-4 text-gray-600">Here’s an overview of today’s attendance.</p>
+                <h2 class="text-2xl font-semibold text-gray-800">Welcome back, {{ user.username }}</h2>
+                <p class="mt-4 text-gray-600">Here’s an overview of this week's attendance and analytics.</p>
 
-                <!-- Display Attendance Data -->
+                <!-- Class Selector Dropdown -->
+                <div class="mt-6">
+                    <label for="classSelect" class="block text-gray-700 font-semibold mb-2">Select Class:</label>
+                    <select id="classSelect" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300" onchange="updateCharts(this.value)">
+                        <option value="classA">Class A</option>
+                        <option value="classB">Class B</option>
+                        <option value="classC">Class C</option>
+                        <!-- Add more class options as needed -->
+                    </select>
+                </div>
+
+                <!-- Display Attendance Charts -->
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Today's Attendance Chart -->
                     <div class="bg-gray-100 p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-medium text-gray-800">Today's Attendance</h3>
-                        <p class="mt-2 text-sm text-gray-600">Total students present today: 150</p>
+                        <canvas id="attendanceChart" width="400" height="400"></canvas>
                     </div>
+
+                    <!-- Late Students Chart -->
                     <div class="bg-gray-100 p-6 rounded-lg shadow-md">
                         <h3 class="text-lg font-medium text-gray-800">Late Students</h3>
-                        <p class="mt-2 text-sm text-gray-600">Total late arrivals: 5</p>
+                        <canvas id="lateChart" width="400" height="400"></canvas>
                     </div>
+
+                    <!-- Weekly Absent Students Chart -->
                     <div class="bg-gray-100 p-6 rounded-lg shadow-md">
-                        <h3 class="text-lg font-medium text-gray-800">Absent Students</h3>
-                        <p class="mt-2 text-sm text-gray-600">Total absences: 10</p>
+                        <h3 class="text-lg font-medium text-gray-800">Weekly Absence Trends</h3>
+                        <canvas id="weeklyAbsentChart" width="400" height="400"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Chart.js Script -->
+    <script>
+        const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+        const lateCtx = document.getElementById('lateChart').getContext('2d');
+        const weeklyAbsentCtx = document.getElementById('weeklyAbsentChart').getContext('2d');
+
+        // Sample data for each class
+        const classData = {
+            classA: {
+                present: 150, late: 5, absent: 10, weeklyAbsence: [10, 12, 15, 7, 8, 5, 4], // Weekly absences
+            },
+            classB: {
+                present: 140, late: 3, absent: 8, weeklyAbsence: [8, 9, 10, 6, 5, 3, 2],
+            },
+            classC: {
+                present: 160, late: 7, absent: 5, weeklyAbsence: [5, 4, 7, 8, 9, 6, 3],
+            },
+        };
+
+        // Function to initialize and update charts based on selected class
+        function updateCharts(selectedClass) {
+            const data = classData[selectedClass];
+            attendanceChart.data.datasets[0].data = [data.present, data.absent];
+            attendanceChart.update();
+            lateChart.data.datasets[0].data = [data.late];
+            lateChart.update();
+            weeklyAbsentChart.data.datasets[0].data = data.weeklyAbsence;
+            weeklyAbsentChart.update();
+        }
+
+        // Initialize charts
+        const attendanceChart = new Chart(attendanceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Present', 'Absent'],
+                datasets: [{
+                    label: 'Today\'s Attendance',
+                    data: [classData.classA.present, classData.classA.absent],
+                    backgroundColor: ['#4CAF50', '#F44336'],
+                }]
+            },
+        });
+
+        const lateChart = new Chart(lateCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Late Arrivals'],
+                datasets: [{
+                    label: 'Late Students',
+                    data: [classData.classA.late],
+                    backgroundColor: ['#FF9800'],
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        const weeklyAbsentChart = new Chart(weeklyAbsentCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Absenteeism (Weekly)',
+                    data: classData.classA.weeklyAbsence,
+                    borderColor: '#F44336',
+                    backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { beginAtZero: true },
+                    y: { beginAtZero: true },
+                },
+            },
+        });
+
+        // Initial load for default class
+        document.addEventListener('DOMContentLoaded', () => updateCharts('classA'));
+    </script>
 </body>
 </html>

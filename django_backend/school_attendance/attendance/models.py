@@ -53,7 +53,7 @@ class Student(models.Model):
     name = models.CharField(max_length=100)
     class_name = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)  # Link to ClassRoom model
     roll_number = models.IntegerField(unique=True)
-    email = models.EmailField(unique=True,default="here@gmail.com")  # Email field added
+    email = models.EmailField(unique=True,default="")  # Email field added
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 

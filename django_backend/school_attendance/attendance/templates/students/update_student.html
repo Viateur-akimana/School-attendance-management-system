@@ -18,21 +18,22 @@
             </div>
             <nav>
                 <ul class="space-y-4 mt-6">
-                    <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
-                    <li><a href="{% url 'list_students' %}" class="block py-2 px-4 hover:bg-gray-700">Students</a></li>
-                    <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700">Classes</a></li>
-                    <li><a href="{% url 'mark_attendance' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
-                    <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700">Reports</a></li>
-                    <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
+                    <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700 rounded-lg">Dashboard</a></li>
+                    <li><a href="{% url 'list_students' %}" class="block py-2 px-4 bg-gray-700 rounded-lg">Students</a></li>
+                    <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700 rounded-lg">Classes</a></li>
+                    <li><a href="{% url 'attendance_list' %}" class="block py-2 px-4 hover:bg-gray-700 rounded-lg">Attendance</a></li>
+                    <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700 rounded-lg">Reports</a></li>
+                    <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700 rounded-lg">Logout</a></li>
                 </ul>
             </nav>
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 p-6">
-            <div class="bg-white shadow-md rounded-lg p-8">
+        <div class="flex-1 p-8">
+            <div class="bg-white shadow-lg rounded-lg p-8">
                 <div class="mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-800">Update Student</h2>
+                    <h2 class="text-3xl font-semibold text-gray-800">Update Student</h2>
+                    <p class="text-gray-600">Update the student details below:</p>
                 </div>
 
                 <form method="post" class="space-y-6">
@@ -44,7 +45,7 @@
                             {{ field.label }}
                         </label>
                         <div class="mt-1">
-                            {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
+                            {{ field|add_class:"w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" }}
                         </div>
                         {% if field.errors %}
                         <div class="text-red-500 text-sm mt-1">
@@ -55,10 +56,10 @@
                     {% endfor %}
 
                     <div class="flex justify-end space-x-4 mt-6">
-                        <a href="{% url 'list_students' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">
+                        <a href="{% url 'list_students' %}" class="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500">
                             Cancel
                         </a>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             Update Student
                         </button>
                     </div>

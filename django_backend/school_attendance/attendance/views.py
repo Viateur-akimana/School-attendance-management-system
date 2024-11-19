@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from .forms import AttendanceFilterForm, AttendanceForm, ClassRoomForm, RegisterForm, LoginForm, StudentForm
-
+from django.db.models import Q
 
 
 # Register view
@@ -66,8 +66,23 @@ def dashboard(request):
 
 # List all students
 def list_students(request):
-    students = Student.objects.all()
-    return render(request, 'students/students.html', {'students': students})
+    # Get the search query from the GET request (if it exists)
+    query = request.GET.get('search', '')  # Defaults to an empty string if no search query is provided
+    
+    # Filter students based on the search query
+    if query:
+        students = Student.objects.filter(
+            Q(roll_number__icontains=query) | Q(name__icontains=query)
+        )
+    else:
+        students = Student.objects.all()  # If no search query, show all students
+    
+    # Pass the students and the search query to the template
+    context = {
+        'students': students,
+        'query': query,
+    }
+    return render(request, 'students/students.html', context)
 
 # Create a new student
 
@@ -108,6 +123,7 @@ def list_classes(request):
     classes = ClassRoom.objects.all()
     return render(request, 'class/classes.html', {'classes': classes})
 
+
 def create_class(request):
     if request.method == 'POST':
         form = ClassRoomForm(request.POST)
@@ -138,7 +154,7 @@ def get_class(request, class_id):
     return render(request, 'class/class_detail.html', {'classroom': classroom})
 
 def mark_attendance(request):
-    selected_class_id = request.GET.get('class')  # Get the selected class from query parameters
+    selected_class_id = request.GET.get('class')  # Get selected class ID from query parameters
     classes = ClassRoom.objects.all()  # All classes
     students = Student.objects.filter(classroom_id=selected_class_id) if selected_class_id else Student.objects.none()
     current_date = timezone.now().date()
@@ -147,7 +163,10 @@ def mark_attendance(request):
         form = AttendanceForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Attendance marked successfully.")
             return redirect('attendance_list')  # Redirect to the attendance list after marking
+        else:
+            messages.error(request, "Error marking attendance. Please check the form.")
     else:
         form = AttendanceForm()
 

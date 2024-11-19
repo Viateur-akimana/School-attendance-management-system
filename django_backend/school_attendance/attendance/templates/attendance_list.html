@@ -20,7 +20,7 @@
                     <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
                     <li><a href="{% url 'list_students' %}" class="block py-2 px-4 hover:bg-gray-700">Students</a></li>
                     <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700">Classes</a></li>
-                    <li><a href="{% url 'mark_attendance' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
+                    <li><a href="{% url 'attendance_list' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
                     <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700">Reports</a></li>
                     <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
                 </ul>
@@ -34,6 +34,9 @@
                     <div class="w-1/2">
                         <select class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option>Search by Student Name or Roll No</option>
+                            {% for student in students %}
+                            <option value="{{ student.roll_number }}">{{ student.name }} ({{ student.roll_number }})</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <a href="{% url 'mark_attendance' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
@@ -42,18 +45,18 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="px-6 py-4 text-left">Roll No</th>
-                                <th class="px-6 py-4 text-left">Student Name</th>
-                                <th class="px-6 py-4 text-left">Class</th>
-                                <th class="px-6 py-4 text-left">Attendance Status</th>
-                                <th class="px-6 py-4 text-left">Date</th>
-                                <th class="px-6 py-4 text-left">Actions</th>
+                    <table class="min-w-full table-auto">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll No</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attendance Status</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white">
+                        <tbody class="bg-white divide-y divide-gray-200">
                             {% for attendance in attendance_records %}
                             <tr class="border-b">
                                 <td class="px-6 py-4">{{ attendance.student.roll_number }}</td>
@@ -62,13 +65,13 @@
                                 <td class="px-6 py-4">{{ attendance.status }}</td>
                                 <td class="px-6 py-4">{{ attendance.date }}</td>
                                 <td class="px-6 py-4">
-                                    <a href="{% url 'update_attendance' attendance.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded mr-2">Edit</a>
-                                    <a href="{% url 'delete_attendance' attendance.id %}" class="bg-red-500 text-white px-3 py-1 rounded">Delete</a>
+                                    <a href="{% url 'update_attendance' attendance.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded mr-2 hover:bg-yellow-600">Edit</a>
+                                    <a href="{% url 'delete_attendance' attendance.id %}" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Delete</a>
                                 </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center py-4">No attendance records found.</td>
+                                <td colspan="6" class="text-center py-4 text-gray-500">No attendance records found.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

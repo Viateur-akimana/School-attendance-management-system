@@ -9,49 +9,66 @@
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
 <body class="font-sans bg-gray-100">
+
+    <!-- Sidebar -->
     <div class="flex">
-        <!-- Sidebar -->
         <div class="w-64 bg-gray-800 text-white min-h-screen">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-center">School Dashboard</h2>
+                <h2 class="text-2xl font-semibold text-center">School Dashboard</h2>
             </div>
             <nav>
                 <ul class="space-y-4 mt-6">
                     <li><a href="{% url 'dashboard' %}" class="block py-2 px-4 hover:bg-gray-700">Dashboard</a></li>
                     <li><a href="{% url 'list_students' %}" class="block py-2 px-4 bg-gray-700">Students</a></li>
                     <li><a href="{% url 'list_classes' %}" class="block py-2 px-4 hover:bg-gray-700">Classes</a></li>
-                    <li><a href="{% url 'mark_attendance' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
+                    <li><a href="{% url 'attendance_list' %}" class="block py-2 px-4 hover:bg-gray-700">Attendance</a></li>
                     <li><a href="{% url 'attendance_report' %}" class="block py-2 px-4 hover:bg-gray-700">Reports</a></li>
                     <li><a href="{% url 'logout_user' %}" class="block py-2 px-4 hover:bg-gray-700">Logout</a></li>
                 </ul>
             </nav>
         </div>
 
-        <div class="flex-1 p-6">
-            <div class="bg-white shadow-md rounded-lg p-8">
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <div class="bg-white shadow-lg rounded-lg p-8">
                 <div class="flex justify-between items-center mb-6">
                     <div class="w-1/2">
-                        <select class="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option>Search by Name or Roll No</option>
-                        </select>
+                        <!-- Search Form -->
+                        <form method="get" action="{% url 'list_students' %}" class="flex space-x-4">
+                            <input type="text" name="search" value="{{ query }}" placeholder="Search by Name or Roll No"
+                                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300">
+                            <button type="submit" class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300">
+                                Search
+                            </button>
+                        </form>
                     </div>
-                    <a href="{% url 'create_student' %}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                    <a href="{% url 'create_student' %}" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-300">
                         Add New Student
                     </a>
                 </div>
 
+                <!-- Students Table -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <tbody class="bg-white">
+                    <table class="min-w-full bg-white rounded-lg shadow-md">
+                        <thead class="bg-gray-700 text-white">
+                            <tr>
+                                <th class="px-6 py-4 text-left">Roll No</th>
+                                <th class="px-6 py-4 text-left">Name</th>
+                                <th class="px-6 py-4 text-left">Class</th>
+                                <th class="px-6 py-4 text-left">Email</th>
+                                <th class="px-6 py-4 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-700">
                             {% for student in students %}
-                            <tr class="border-b">
+                            <tr class="border-b hover:bg-gray-100">
                                 <td class="px-6 py-4">{{ student.roll_number }}</td>
                                 <td class="px-6 py-4">{{ student.name }}</td>
                                 <td class="px-6 py-4">{{ student.class_name.name }}</td>
                                 <td class="px-6 py-4">{{ student.email }}</td>
-                                <td class="px-6 py-4">
-                                    <a href="{% url 'update_student' student.id %}" class="bg-yellow-500 text-white px-3 py-1 rounded mr-2">Edit</a>
-                                    <a href="{% url 'delete_student' student.id %}" class="bg-red-500 text-white px-3 py-1 rounded">Delete</a>
+                                <td class="px-6 py-4 text-center">
+                                    <a href="{% url 'update_student' student.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition duration-300 mr-2">Edit</a>
+                                    <a href="{% url 'delete_student' student.id %}" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300">Delete</a>
                                 </td>
                             </tr>
                             {% empty %}
@@ -65,5 +82,6 @@
             </div>
         </div>
     </div>
+
 </body>
 </html>

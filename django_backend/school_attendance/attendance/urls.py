@@ -18,6 +18,5 @@ urlpatterns = [
     path('mark_attendance/', mark_attendance, name='mark_attendance'),
     path('attendance_list/', attendance_list, name='attendance_list'),
     path('attendance_report',attendance_report,name='attendance_report'),
-    path('logout',login_user,name="logout_user")
-
+    path('logout',login_user,name="logout_user"),
 ]
