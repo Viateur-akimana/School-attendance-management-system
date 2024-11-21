@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 class UserBase(BaseModel):
@@ -23,6 +23,22 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: Optional[str] = None
 
+class ClassRoomBase(BaseModel):
+    name: str
+
+class ClassRoomCreate(ClassRoomBase):
+    pass
+
+class ClassRoomUpdate(BaseModel):
+    name: Optional[str]
+
+class ClassRoom(ClassRoomBase):
+    id: int
+    students: List["Student"]
+
+    class Config:
+        orm_mode = True
+
 class StudentBase(BaseModel):
     name: str
     class_room_id: int
@@ -33,15 +49,47 @@ class StudentCreate(StudentBase):
     pass
 
 class StudentUpdate(BaseModel):
-    name: Optional[str] = None
-    class_room_id: Optional[int] = None
-    roll_number: Optional[int] = None
-    email: Optional[EmailStr] = None
+    name: Optional[str]
+    class_room_id: Optional[int]
+    roll_number: Optional[int]
+    email: Optional[EmailStr]
 
 class Student(StudentBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class AttendanceBase(BaseModel):
+    student_id: int
+    status: bool
+
+class AttendanceCreate(AttendanceBase):
+    pass
+
+class AttendanceUpdate(BaseModel):
+    student_id: Optional[int]
+    status: Optional[bool]
+
+class Attendance(AttendanceBase):
+    id: int
+    date: datetime
+
+    class Config:
+        orm_mode = True
+
+class NotificationBase(BaseModel):
+    student_id: int
+    message: str
+
+class NotificationCreate(NotificationBase):
+    pass
+
+class Notification(NotificationBase):
+    id: int
+    date_sent: datetime
 
     class Config:
         orm_mode = True

@@ -1,5 +1,5 @@
 import os
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str = os.getenv("DATABASE_URL", "postgresql://viateur:viateur123@localhost/students")

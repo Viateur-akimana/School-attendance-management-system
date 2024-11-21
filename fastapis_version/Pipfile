@@ -10,11 +10,11 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 pydantic-settings = "*"
 alembic = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = "*"}
 python-multipart = "*"
 psycopg2 = "*"
 pydantic = {extras = ["email"], version = "*"}
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
 
 [dev-packages]
 pytest = "*"
