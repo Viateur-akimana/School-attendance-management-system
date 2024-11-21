@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+pydantic-settings = "*"
+alembic = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
+passlib = {extras = ["bcrypt"], version = "*"}
+python-multipart = "*"
+
+[dev-packages]
+pytest = "*"
+httpx = "*"
+flake8 = "*"
+black = "*"
+isort = "*"
+
+[requires]
+python_version = "3.10"
+python_full_version = "3.10.12"
