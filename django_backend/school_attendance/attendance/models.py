@@ -61,14 +61,15 @@ class Student(models.Model):
         return f"{self.name} - Roll No: {self.roll_number}"
 
 class Attendance(models.Model):
+    STATUS_CHOICES = [
+        ('Present', 'Present'),
+        ('Absent', 'Absent'),
+        ('Late', 'Late'),
+    ]
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="attendances")
     class_name = models.ForeignKey(ClassRoom, on_delete=models.CASCADE)
     date = models.DateField(default=timezone.now)
-    status = models.CharField(
-        max_length=10,
-        choices=[('Present', 'Present'), ('Absent', 'Absent')],
-        default='Absent',
-    )
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Absent')
 
     def __str__(self):
         return f"{self.student.name} - {self.class_name.name} - {self.date} - {self.status}"
@@ -77,30 +78,20 @@ class Attendance(models.Model):
         super().save(*args, **kwargs)
         if self.status == "Absent":
             create_absence_notification(self.student)
-            
+
 
 def create_absence_notification(student):
-    """
-    Creates a notification for absent students and sends an email.
-    """
-    # Define the title and message for the notification
     title = "Absence Alert"
     message = f"Dear {student.name}, you were marked as absent in class {student.class_name.name} on {timezone.now().date()}."
-
-    # Create a Notification instance
     notification = Notification.objects.create(
         title=title,
         recipient_email=student.email,
         message=message
     )
-
-    # Send the email
     send_absence_email(notification)
 
+
 def send_absence_email(notification):
-    """
-    Sends an email notification for absent students.
-    """
     send_mail(
         subject=notification.title,
         message=notification.message,
@@ -108,14 +99,14 @@ def send_absence_email(notification):
         recipient_list=[notification.recipient_email],
         fail_silently=False,
     )
-    # Update notification as sent
     notification.is_sent = True
     notification.save()
-    
+
+
 class Notification(models.Model):
-    title = models.CharField(max_length=100)  
-    recipient_email = models.EmailField()    
-    message = models.TextField()              
+    title = models.CharField(max_length=100)
+    recipient_email = models.EmailField()
+    message = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     is_sent = models.BooleanField(default=False)
 

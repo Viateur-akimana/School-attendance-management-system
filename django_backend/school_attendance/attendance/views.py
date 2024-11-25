@@ -4,8 +4,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
-from .forms import AttendanceFilterForm, AttendanceForm, ClassRoomForm, RegisterForm, LoginForm, StudentForm
+from .forms import AttendanceForm, ClassRoomForm, RegisterForm, LoginForm, StudentForm, Attendance
 from django.db.models import Q
+from django.utils.dateparse import parse_date
+import json
+from datetime import datetime, timedelta
+from .models import ClassRoom, Attendance  
 
 
 # Register view
@@ -48,21 +52,43 @@ def logout_user(request):
 
 def dashboard(request):
     if request.user.is_authenticated:
-        # Get data for the dashboard
-        students = Student.objects.all()
-        classrooms = ClassRoom.objects.all()
-        today_attendance = Attendance.objects.filter(date=timezone.now().date())
-        
-        # Get attendance summary (for today, or per classroom)
-        context = {
-            'students': students,
-            'classrooms': classrooms,
-            'today_attendance': today_attendance,
-        }
+        classes = ClassRoom.objects.all()
+        attendance_data = {}
+        today = timezone.now().date()
 
+        for class_obj in classes:
+            # Get today's attendance
+            today_attendance = Attendance.objects.filter(
+                class_name=class_obj,
+                date=today
+            )
+
+            # Calculate weekly attendance (last 7 days)
+            weekly_absence = []
+            for i in range(6, -1, -1):  # Last 7 days
+                date = today - timedelta(days=i)
+                absent_count = Attendance.objects.filter(
+                    class_name=class_obj,
+                    date=date,
+                    status='Absent'
+                ).count()
+                weekly_absence.append(absent_count)
+
+            # Store data for this class
+            attendance_data[str(class_obj.id)] = {
+                'present': today_attendance.filter(status='Present').count(),
+                'absent': today_attendance.filter(status='Absent').count(),
+                'late': today_attendance.filter(status='Late').count(),
+                'weekly_absence': weekly_absence
+            }
+
+        context = {
+            'classes': classes,
+            'attendance_data': json.dumps(attendance_data),
+            'user': request.user
+        }
         return render(request, 'dashboard.html', context)
-    else:
-        return redirect('login')
+    return redirect('login')
 
 # List all students
 def list_students(request):
@@ -154,49 +180,80 @@ def get_class(request, class_id):
     return render(request, 'class/class_detail.html', {'classroom': classroom})
 
 def mark_attendance(request):
-    selected_class_id = request.GET.get('class')  # Get selected class ID from query parameters
-    classes = ClassRoom.objects.all()  # All classes
-    students = Student.objects.filter(classroom_id=selected_class_id) if selected_class_id else Student.objects.none()
-    current_date = timezone.now().date()
-
     if request.method == 'POST':
         form = AttendanceForm(request.POST)
         if form.is_valid():
+
             form.save()
-            messages.success(request, "Attendance marked successfully.")
-            return redirect('attendance_list')  # Redirect to the attendance list after marking
-        else:
-            messages.error(request, "Error marking attendance. Please check the form.")
+            messages.success(request, "Attendance has been recorded.")
+    
+            return redirect('attendance_list')
     else:
         form = AttendanceForm()
 
-    return render(request, 'mark_attendance.html', {
-        'form': form,
-        'classes': classes,
-        'students': students,
-        'selected_class_id': selected_class_id,
-        'current_date': current_date,
-    })
+    return render(request, 'attendance/mark_attendance.html', {'form': form})
 
-# View to list attendance records (optional)
+
 def attendance_list(request):
-    attendances = Attendance.objects.all()
-    return render(request, 'attendance_list.html', {'attendances': attendances})
-
+    # Fetch all attendance records
+    attendances = Attendance.objects.all().order_by('-date')
+    return render(request, 'attendance/attendance_list.html', {'attendances': attendances})
 
 def attendance_report(request):
-    form = AttendanceFilterForm(request.GET)
+    filter_class = request.GET.get('class', '')
+    filter_date = request.GET.get('date', '')
+    filter_status = request.GET.get('status', '')
+
+    # Filtering logic
     attendance_records = Attendance.objects.all()
 
-    if form.is_valid():
-        if form.cleaned_data['class_name']:
-            attendance_records = attendance_records.filter(class_name=form.cleaned_data['class_name'])
-        if form.cleaned_data['date']:
-            attendance_records = attendance_records.filter(date=form.cleaned_data['date'])
-        if form.cleaned_data['status']:
-            attendance_records = attendance_records.filter(status=form.cleaned_data['status'])
+    if filter_class:
+        attendance_records = attendance_records.filter(class_name_id=filter_class)
+    
+    if filter_date:
+        filter_date = parse_date(filter_date)
+        attendance_records = attendance_records.filter(date=filter_date)
+    
+    if filter_status:
+        attendance_records = attendance_records.filter(status=filter_status)
+
+    class_list = ClassRoom.objects.all()
 
     return render(request, 'attendance/attendance_report.html', {
-        'form': form,
         'attendance_records': attendance_records,
+        'class_list': class_list,
+        'filter_class': filter_class,
+        'filter_date': filter_date,
+        'filter_status': filter_status,
+    }) 
+
+
+
+def dashboard_view(request):
+    classes = ClassRoom.objects.all()
+    attendance_data = {}
+
+    for cls in classes:
+        # Calculate today's attendance breakdown
+        today_attendance = Attendance.objects.filter(class_name=cls, date=datetime.date.today())
+        present_count = today_attendance.filter(status="Present").count()
+        absent_count = today_attendance.filter(status="Absent").count()
+        late_count = today_attendance.filter(status="Late").count()
+        
+        # Weekly absence trend (Mon-Sun)
+        weekly_absence = [
+            Attendance.objects.filter(class_name=cls, status="Absent", date__week_day=i).count()
+            for i in range(2, 9)  # Django weekday 2=Monday to 8=Sunday
+        ]
+
+        attendance_data[cls.id] = {
+            'present': present_count,
+            'absent': absent_count,
+            'late': late_count,
+            'weekly_absence': weekly_absence,
+        }
+
+    return render(request, 'dashboard.html', {
+        'classes': classes,
+        'attendance_data': attendance_data,
     })
