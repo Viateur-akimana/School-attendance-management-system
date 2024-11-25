@@ -31,21 +31,12 @@ class ClassRoomForm(forms.ModelForm):
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
-        fields = ['student', 'class_name', 'status', 'date']
+        fields = ['student', 'class_name', 'date', 'status']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
-    # Optionally, you can add any additional validation or field widgets
-    # Example: limit students to those in the selected class
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if 'class_name' in self.data:
-            try:
-                class_id = int(self.data.get('class_name'))
-                self.fields['student'].queryset = Student.objects.filter(class_name_id=class_id)
-            except (ValueError, TypeError):
-                pass
-        elif self.instance.pk:
-            self.fields['student'].queryset = self.instance.class_name.student_set.all()
-class AttendanceFilterForm(forms.Form):
-    class_name = forms.ModelChoiceField(queryset=ClassRoom.objects.all(), required=False)
-    date = forms.DateField(widget=forms.SelectDateWidget(), required=False)
-    status = forms.ChoiceField(choices=[('', 'All'), ('Present', 'Present'), ('Absent', 'Absent')], required=False)
+        self.fields['class_name'].queryset = ClassRoom.objects.all()
+        self.fields['student'].queryset = Student.objects.all()

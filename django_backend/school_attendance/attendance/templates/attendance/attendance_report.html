@@ -1,4 +1,3 @@
-<!-- attendance_report.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -26,10 +25,12 @@
             </ul>
         </nav>
     </div>
+
     <!-- Main Content -->
     <main class="flex-1 p-8">
         <h2 class="text-3xl font-semibold text-gray-800 mb-6">Attendance Report for Class: <span class="text-blue-600">{{ class_name }}</span></h2>
 
+        <!-- Filter Form -->
         <form method="get" class="bg-white p-6 rounded-lg shadow-md mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Class Filter -->
@@ -61,7 +62,7 @@
             </div>
 
             <button type="submit" class="mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
-                <i class="fas fa-filter mr-2"></i> Apply Filters
+                Apply Filters
             </button>
         </form>
 
@@ -98,8 +99,5 @@
         </div>
     </main>
 
-
 </body>
 </html>
-
-
