@@ -10,7 +10,7 @@ django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
 django-widget-tweaks = "*"
 python-dotenv = "*"
-psycopg2 = "*"
+psycopg2-binary = "*"
 
 [dev-packages]
 

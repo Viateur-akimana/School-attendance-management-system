@@ -3,15 +3,14 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-WORKDIR /app
+WORKDIR /app/school_attendance
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        gcc \
-        python3-dev \
+# Install PostgreSQL dependencies first
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/* \
-    && pip install --no-cache-dir pipenv
+    && pip install psycopg2
 
 COPY Pipfile Pipfile.lock ./
 
@@ -19,4 +18,8 @@ RUN pipenv install --system --deploy
 
 COPY . .
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"] 
+EXPOSE 8000
+
+CMD ["python", "school_attendance/manage.py", "runserver", "0.0.0.0:8000"]
+
+

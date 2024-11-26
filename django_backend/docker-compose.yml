@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  web:
+  postgres:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/app
-      - sqlite_data:/app/db
+      - postgres_data:/var/lib/postgresql/data
     ports:
-      - "8000:8000"
+      - "5432:5432"
     environment:
       - DEBUG=1
       - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 
 volumes:
-  sqlite_data: 
+  postgres_data: 
