@@ -5,12 +5,12 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app/school_attendance
 
-# Install PostgreSQL dependencies first
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     libpq-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/* \
-    && pip install psycopg2
+    && pip install pipenv
 
 COPY Pipfile Pipfile.lock ./
 
